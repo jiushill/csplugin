@@ -15,6 +15,10 @@ ctrl+l
 ![](images/information.png)
 
 ### JuicyPotato提权 ###
+![](images/potato.png)
+
+![](images/potato2.png)
+
 ![](images/potatodel.png)
 
 ### 提权工具快速利用 ###
