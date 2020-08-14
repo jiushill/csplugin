@@ -3,6 +3,7 @@
 * 统计在线主机和掉线主机
 * windows信息收集
 * JuicyPotato提权
+* 提权工具快速利用
 
 ### 统计在线主机和掉线主机 ###
 ctrl+l
@@ -15,3 +16,5 @@ ctrl+l
 
 ### JuicyPotato提权 ###
 ![](images/potatodel.png)
+
+### 提权工具快速利用 ###
