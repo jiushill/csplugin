@@ -18,3 +18,8 @@ ctrl+l
 ![](images/potatodel.png)
 
 ### 提权工具快速利用 ###
+![](images/img.png)
+
+![](images/setpath.png)
+
+![](images/winexp.png)
