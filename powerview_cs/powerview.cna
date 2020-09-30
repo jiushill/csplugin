@@ -1,0 +1,255 @@
+###############
+#author:jiushi #
+#time:2020/9/30 #
+#################
+
+alias Get-NetDomain{
+	bpowerpick($1, "Get-NetDomain");
+}
+
+alias Get-NetUser{
+	bpowerpick($1, "Get-NetUser");
+}
+
+alias Get-NetComputer{
+	bpowerpick($1, "Get-NetComputer");
+}
+
+alias Get-NetDomainController{
+	bpowerpick($1, "Get-NetDomainController");
+}
+
+alias Get-NetComputer{
+	bpowerpick($1, "Get-NetComputer");
+}
+alias Get-NetPrinter{
+	bpowerpick($1, "Get-NetPrinter");
+}
+alias Get-NetOU{
+	bpowerpick($1, "Get-NetOU");
+}
+alias Get-NetGroup{
+	bpowerpick($1, "Get-NetGroup");
+}
+alias Get-NetGroupMember{
+	bpowerpick($1, "Get-NetGroupMember");
+}
+alias Get-NetFileServer{
+	bpowerpick($1, "Get-NetFileServer");
+}
+alias Get-NetShare{
+	bpowerpick($1, "Get-NetShare");
+}
+alias Get-DFSshare{
+	bpowerpick($1, "Get-DFSshare");
+}
+alias Get-NetSubnet{
+	bpowerpick($1, "Get-NetSubnet");
+}
+alias Get-NetSite{
+	bpowerpick($1, "Get-NetSite");
+}
+alias Get-NetDomainTrust{
+	bpowerpick($1, "Get-NetDomainTrust");
+}
+alias Get-NetForestTrust{
+	bpowerpick($1, "Get-NetForestTrust");
+}
+alias Find-ForeignUser{
+	bpowerpick($1, "Find-ForeignUser");
+}
+alias Find-ForeignGroup{
+	bpowerpick($1, "Find-ForeignGroup");
+}
+alias Invoke-MapDomainTrust{
+	bpowerpick($1, "Invoke-MapDomainTrust");
+}
+alias Get-NetLoggedon{
+	bpowerpick($1, "Get-NetLoggedon");
+}
+alias Get-NetLocalGroup{
+	bpowerpick($1, "Get-NetLocalGroup");
+}
+alias Get-NetSession{
+	bpowerpick($1, "Get-NetSession");
+}
+alias Get-NetRDPSession{
+	bpowerpick($1, "Get-NetRDPSession");
+}
+alias Get-NetProcess{
+	bpowerpick($1, "Get-NetProcess");
+}
+alias Get-UserEvent{
+	bpowerpick($1, "Get-UserEvent");
+}
+alias Get-ADObject{
+	bpowerpick($1, "Get-ADObject");
+}
+alias Get-NetGPO{
+	bpowerpick($1, "Get-NetGPO");
+}
+alias Get-NetGPOGroup{
+	bpowerpick($1, "Get-NetGPOGroup");
+}
+alias Find-GPOLocation{
+	bpowerpick($1, "Find-GPOLocation");
+}
+alias Find-GPOComputerAdmin{
+	bpowerpick($1, "Find-GPOComputerAdmin");
+}
+alias Get-DomainPolicy{
+	bpowerpick($1, "Get-DomainPolicy");
+}
+alias Get-DomainSID{
+	bpowerpick($1, "Get-DomainSID");
+}
+alias Invoke-UserHunter{
+	bpowerpick($1, "Invoke-UserHunter");
+}
+alias Invoke-ProcessHunter{
+	bpowerpick($1, "Invoke-ProcessHunter");
+}
+alias Invoke-UserEventHunter{
+	bpowerpick($1, "Invoke-UserEventHunter");
+}
+alias Invoke-ShareFinder{
+	bpowerpick($1, "Invoke-ShareFinder");
+}
+alias Invoke-FileFinder{
+	bpowerpick($1, "Invoke-FileFinder");
+}
+alias Find-LocalAdminAccess{
+	bpowerpick($1, "Find-LocalAdminAccess");
+}
+alias Find-ManagedSecurityGroups{
+	bpowerpick($1, "Find-ManagedSecurityGroups");
+}
+alias Get-ExploitableSystem{
+	bpowerpick($1, "Get-ExploitableSystem");
+}
+alias Invoke-EnumerateLocalAdmin{
+	bpowerpick($1, "Invoke-EnumerateLocalAdmin");
+}
+
+
+alias powerview-help{
+	blog2($1, "本插件集成powerview常用的命令(需要自定义命令的还请powerpick)");
+	blog2($1, "powerview-import 导入powerview脚本 (导入分支的时候记得先清空原先导入的)");
+	blog2($1, "Get-NetDomain 获取当前用户所在域的名称");
+	blog2($1, "Get-NetUser 获取所有用户的详细信息");
+	blog2($1, "Get-NetDomainController 获取所有域控制器的信息");
+    blog2($1, "Get-NetComputer 获取域内所有机器的详细信息");
+    blog2($1, "Get-NetPrinter 获取域中所有当前计算机对象的数组");
+    blog2($1, "Get-NetOU 获取域内的OU信息");
+    blog2($1, "Get-NetGroup 获取所有域内组和组成员的信息");
+    blog2($1, "Get-NetGroupMember 获取指定域组中所有当前用户的列表");
+    blog2($1, "Get-NetFileServer 根据SPN获取当前域使用的文件服务器信息");
+    blog2($1, "Get-NetShare 获取当前域内所有的网络共享信息");
+    blog2($1, "Get-DFSshare 获取域上所有分发文件系统共享的列表");
+    blog2($1, "Get-NetSubnet 获取域的其他网段");
+    blog2($1, "Get-NetSite 获取域内的当前站点");
+    blog2($1, "Get-NetDomainTrust 获取当前用户域的所有信任");
+    blog2($1, "Get-NetForestTrust 获取与当前用户的域关联的林的所有信任");
+    blog2($1, "Find-ForeignUser 枚举在其主域之外的组中的用户");
+    blog2($1, "Find-ForeignGroup 枚举域组的所有成员并查找查询域之外的用户");
+    blog2($1, "Invoke-MapDomainTrust 尝试构建所有域信任的关系映射");
+    blog2($1, "Get-NetLoggedon 获取主动登录到指定服务器的用户");
+    blog2($1, "Get-NetLocalGroup 获取一个或多个远程主机上本地组的成员");
+    blog2($1, "Get-NetSession 获取指定服务器的会话");
+    blog2($1, "Get-NetRDPSession 获取指定服务器的远程连接");
+    blog2($1, "Get-NetProcess 获取远程主机的进程");
+    blog2($1, "Get-UserEvent 获取指定用户的日志");
+    blog2($1, "Get-ADObject 获取活动目录的对象");
+    blog2($1, "Get-NetGPO 获取域内所有的组策略对象");
+    blog2($1, "Get-NetGPOGroup 获取域中设置”受限组”的所有GPO");
+    blog2($1, "Find-GPOLocation 获取用户/组，并通过GPO枚举和关联使其具有有效权限的计算机");
+    blog2($1, "Find-GPOComputerAdmin 获取计算机并通过GPO枚举确定谁对其具有管理权限");
+    blog2($1, "Get-DomainPolicy 获取域默认策略或域控制器策略");
+    blog2($1, "Get-DomainSID 返回指定域的SID");
+    blog2($1, "Invoke-UserHunter 获取域用户登录的计算机信息及该用户是否有本地管理员权限");
+    blog2($1, "Invoke-ProcessHunter 通过查询域内所有的机器进程找到特定用户");
+    blog2($1, "Invoke-UserEventHunter 根据用户日志查询某域用户登陆过哪些域机器");
+    blog2($1, "Invoke-ShareFinder 在本地域中的主机上查找（非标准）共享");
+    blog2($1, "Invoke-FileFinder 在本地域中的主机上查找潜在的敏感文件");
+    blog2($1, "Find-LocalAdminAccess 在域上查找当前用户具有本地管理员访问权限的计算机");
+    blog2($1, "Find-ManagedSecurityGroups 搜索受管理的活动目录安全组并标识对其具有写访问权限的用户，即这些组拥有添加或删除成员的能力");
+    blog2($1, "Get-ExploitableSystem 发现系统可能易受常见攻击");
+    blog2($1, "Invoke-EnumerateLocalAdmin 枚举域中所有计算机上本地管理员组的成员");
+}
+
+
+alias powerview-import{
+	$bid = $1;
+	if($2 eq 1){
+		$id = 1;
+		fileexists($id, $bid);
+	}else if($2 eq 0){
+		$id = 0;
+		fileexists($id, $bid);
+	}else{
+		blog2($1, "powerview-import 1 导入master分支的powerview.ps1");
+		blog2($1, "powerview-import 0 导入dev分支的powerview.ps1");
+		blog2($1, "导入powerview脚本 (导入分支的时候记得先清空原先导入的)");
+	}
+}
+
+
+sub fileexists{
+	if ($id eq 1){
+		$file = "PowerView_master.ps1";
+	}else{
+		$file = "PowerViewv3.0.ps1";
+	}
+
+	if( -exists script_resource($file)){
+		btask($bid, "[*] found file:".$file);
+		bpowershell_import($bid, script_resource($file));
+		btask($bid, "[!] load module:".$f." Sucess");
+		btask($bid, "[*] Test whether the import is successful,get domain SID");
+		bpowerpick($bid, "Get-DomainSID");
+	}
+}
+
+sub main{
+	if ($3['set'] eq '约束委派'){
+		if($3['type'] eq 'computer'){
+			$command = 'Get-DomainComputer -TrustedToAuth -Domain '.$3['domain'];
+		}else{
+			$command = 'Get-DomainUser -TrustedToAuth -Domain '.$3['domain'];
+		}
+		bpowershell_import_clear($bid);
+		$id = 1;
+		fileexists($id, $bid);
+		bpowerpick($bid, $command);
+	}else{
+		bpowershell_import_clear($bid);
+		$id = 0;
+		fileexists($id, $bid);
+		if($3['type'] eq 'computer'){
+			$command = 'Get-NetUser -Unconstrained -Domain '.$3['domain'];
+		}else{
+			$command = 'Get-NetComputer -Unconstrained -Domain '.$3['domain'];
+		}
+		bpowerpick($bid, $command);
+	}
+}
+
+sub ui{
+	$dialog = dialog("info", %(domain => "YAYI.local", bid => $bid), &main);
+	dialog_description($dialog, "约束委派/非约束委派查询(非约束委派查询时，由于要导入另外分支的powerview将清空导入的ps1脚本)");
+	drow_combobox($dialog, "set", "委派类型:", @("约束委派", "非约束委派"));
+	drow_combobox($dialog, "type", "查询类型:", @("computer", "user"));
+	drow_text($dialog, "domain", "domain:");
+	dbutton_action($dialog, "RUN");
+	dialog_show($dialog);
+}
+
+popup beacon_bottom{
+	menu "PowerView"{
+		$bid = $1;
+		item "约束委派用户查询"{
+			ui($bid);
+		}
+
+	}
+}
