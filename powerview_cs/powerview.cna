@@ -234,6 +234,16 @@ sub main{
 	}
 }
 
+sub main2{
+	bpowershell_import_clear($bid);
+	$id = 1;
+	fileexists($id, $bid);
+	bpowerpick($bid, $command);
+	$command = "Get-DomainGPO -Domain ".$3['domain']." -Properties Name, DisplayName";
+	bpowerpick($bid, $command);
+
+}
+
 sub ui{
 	$dialog = dialog("info", %(domain => "YAYI.local", bid => $bid), &main);
 	dialog_description($dialog, "约束委派/非约束委派查询(非约束委派查询时，由于要导入另外分支的powerview将清空导入的ps1脚本)");
@@ -244,11 +254,24 @@ sub ui{
 	dialog_show($dialog);
 }
 
+sub ui2{
+	$dialog = dialog("info",%(domain => "YAYI.local",bid => $bid), &main2);
+	dialog_description($dialog, "查询域内GPO名称和GPU objectid");
+	drow_text($dialog, "domain", "domain:");
+	dbutton_action($dialog, "RUN");
+	dialog_show($dialog);
+}
+
+
 popup beacon_bottom{
 	menu "PowerView"{
 		$bid = $1;
 		item "约束委派用户查询"{
 			ui($bid);
+		}
+
+		item "GPO查询"{
+			ui2($bid);
 		}
 
 	}
