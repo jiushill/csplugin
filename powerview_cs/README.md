@@ -62,3 +62,5 @@ Invoke-EnumerateLocalAdmin 枚举域中所有计算机上本地管理员组的�
 ![](img/5.png)
 
 ![](img/6.png)
+
+![](img/7.png)
