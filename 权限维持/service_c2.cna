@@ -112,7 +112,7 @@ sub msdtc_config{
 
 sub msdtc{
 	$dialog = dialog("msdtc DLL hijack config", %(file => "",file2 => "C:\\Windows\\System32"), &msdtc_config);
-	dialog_description($dialog, "msdtc DLL劫持,将DLL名称改为");
+	dialog_description($dialog, "msdtc DLL劫持");
 	drow_file($dialog, "file", "DLL Path:");
 	drow_text($dialog, "file2", "RHOST Path:");
 	dbutton_action($dialog, "RUN");
