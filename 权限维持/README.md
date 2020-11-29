@@ -17,3 +17,5 @@
 ![](img/msdtc/msdtc2.png)
 
 ## WmiPrvSE提权/权限维持 ##
+![](img/WmiPrvSE/7.png)
+![](img/WmiPrvSE/2008.png)
