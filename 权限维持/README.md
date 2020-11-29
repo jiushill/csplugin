@@ -3,6 +3,7 @@
 * cs自带的beacon服务马  
 *  winrm后门  
 * msdtc DLL劫持  
+* WmiPrvSE提权/权限维持
 
 待开发..............
 
@@ -14,3 +15,5 @@
 ## msdtc DLL劫持 ##
 ![](img/msdtc/msdtc.png)
 ![](img/msdtc/msdtc2.png)
+
+## WmiPrvSE提权/权限维持 ##
