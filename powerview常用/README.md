@@ -1,7 +1,7 @@
 ## powerview查询 ##
 ![](one.jpg)
 
-修复了2008等需要依赖`Microsoft.ActiveDirectory.Management.dll`通常导入powerview.ps1缺少的依赖
+2008无AD模块的需要先点击上传AD模块，然后在点击对应的功能 -> 2008_query.cna
 ![](2008.png)
 
 ## 更新记录 ##
