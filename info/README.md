@@ -4,6 +4,7 @@
 * windows信息收集
 * JuicyPotato提权
 * 提权工具快速利用
+* ip route(获取内网IP段)
 
 ### 统计在线主机和掉线主机 ###
 ctrl+l
@@ -27,3 +28,8 @@ ctrl+l
 ![](images/setpath.png)
 
 ![](images/winexp.png)
+
+### ip route(获取内网IP段) ###
+![](images/iproute.png)
+
+![](images/iproute2.png)
