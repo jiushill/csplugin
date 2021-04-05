@@ -1,6 +1,6 @@
 sub frpsocks{
 	if("README" eq $2){
-		show_message("FrpSocks5帮助\ntips:如果你的VPS上已经监听好了FRP则直接填写对应的配置即可\nserver_addr:你的VPS地址\nserver_port:VPS上FPR对应的监听端口\ntoken:FRP的token验证\nsocks5_Listenport:VPS SOCKS5成功后监听的贷款");
+		show_message("FrpSocks5帮助\ntips:如果你的VPS上已经监听好了FRP则直接填写对应的配置即可\nserver_addr:你的VPS地址\nserver_port:VPS上FPR对应的监听端口\ntoken:FRP的token验证\nsocks5_Listenport:VPS SOCKS5成功后监听的端口");
 	}else{
 		foreach $id ($bid){
 			btask($id, "server_addr:$3['addr'] server_port:$3['port'] token:$3['token'] socks5Listenport:$3['listenport']");
