@@ -1,0 +1,13 @@
+popup beacon_bottom{
+	item "杀毒查询"{
+		foreach $id ($1){
+			bpowershell_import!($id, script_resource("check.ps1"));
+			bpowerpick!($id, "avquery");
+		}
+	}
+}
+
+alias avquery{
+	bpowershell_import!($1, script_resource("check.ps1"));
+	bpowerpick!($1, "avquery");
+}
