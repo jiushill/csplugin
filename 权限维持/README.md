@@ -21,3 +21,6 @@
 ![](img/WmiPrvSE/2008.png)
 
 ## CacheTask任务计划COM接口劫持 ##
+![](img/CacheTask/CacheTask.png)
+![](img/CacheTask/CacheTask2.png)
+![](img/CacheTask/CacheTask.gif)
