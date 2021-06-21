@@ -25,3 +25,10 @@
 ![](img/CacheTask/CacheTask.png)
 ![](img/CacheTask/CacheTask2.png)
 ![](img/CacheTask/CacheTask.gif)
+
+## Rid劫持 ##
+![](img/rid/1.png)
+![](img/rid/0.png)
+![](img/rid/2.png)
+![](img/rid/4.png)
+![](img/rid/6.png)
