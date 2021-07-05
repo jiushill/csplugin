@@ -1,0 +1,25 @@
+sub recentqueryfunc{
+	$path = script_resource("openfilehistory.exe");
+	bupload($3['bid'], $path);
+	bshell($3['bid'], "openfilehistory.exe $3['username']");
+}
+
+
+sub recentquery{
+	$dialog = dialog("最近使用痕迹查询", %(username => "Administrator", bid => $id), &recentqueryfunc);
+	dialog_description($dialog, "要查询的用户名输入");
+	drow_text($dialog, "username", "USERNAME:");
+	dbutton_action($dialog, "run");
+	dialog_show($dialog);
+}
+
+popup beacon_bottom {
+	menu "windows取证"{
+		$bid = $1;
+		item "最近使用痕迹"{
+			foreach $id ($bid){
+				recentquery($id)
+			}
+		}
+	}
+}
