@@ -5,6 +5,7 @@
 * msdtc DLL劫持  
 * WmiPrvSE提权/权限维持
 * CacheTask任务计划COM接口劫持 (适用于:windows 10/windows 2012以上)
+* lnk快捷键劫持
 
 待开发..............
 
@@ -32,3 +33,6 @@
 ![](img/rid/2.png)
 ![](img/rid/4.png)
 ![](img/rid/6.png)
+
+## lnk快捷键劫持 ##  
+
