@@ -37,4 +37,4 @@
 ## lnk快捷键劫持 ##  
 ![](img/lnkhijack/1.png)
 ![](img/lnkhijack/2.png)
-![](img/lnkhijack/3.gif)
+![](https://z3.ax1x.com/2021/10/19/5a4Ucn.gif)
