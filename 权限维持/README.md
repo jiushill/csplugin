@@ -35,4 +35,6 @@
 ![](img/rid/6.png)
 
 ## lnk快捷键劫持 ##  
-
+![](img/lnkhijack/1.png)
+![](img/lnkhijack/2.png)
+![](img/lnkhijack/3.gif)
