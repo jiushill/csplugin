@@ -38,3 +38,9 @@
 ![](img/lnkhijack/1.png)
 ![](img/lnkhijack/2.png)
 ![](https://z3.ax1x.com/2021/10/19/5a4Ucn.gif)
+
+## userAccountControl将ID设置为8192作为域控 ##
+![](img/userAccountControl/1.png)
+![](img/userAccountControl/2.png)
+![](img/userAccountControl/3.png)
+![](img/userAccountControl/4.png)
