@@ -7,6 +7,7 @@
 * CacheTask任务计划COM接口劫持 (适用于:windows 10/windows 2012以上)
 * RID劫持
 * lnk快捷键劫持
+* java运行class文件
 * dnsadmin账号组进行dns.dll劫持 （适用于域）
 * userAccountControl将ID设置为8192作为域控（适用于域）
 
