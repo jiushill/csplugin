@@ -459,6 +459,7 @@ sub SunloginClient{
 			btask($1, "向日葵配置文件获取");
 			btask($1, "本机验证码参数：encry_pwd\n本机识别码参数：\c3fastcode(去掉开头字母)\n\c3sunlogincode：判断用户是否登录状态\n请判断config.ini配置文件中是否存在\c3sunlogincode参数,存在为登录状态否则未登录");
 			btask($1, "安装版向日葵路径:C:\\Program Files\\Oray\\SunLogin\\SunloginClient\\config.ini");
+			btask($1, "便携版(绿色版)向日葵路径: C:\\Users\\<UserName>\\AppData\\Roaming\\Oray\\SunloginClientLite\\sys_lite_config.ini");
 			btask($1, "便携版(绿色版)整体配置文件: C:\\ProgramData\\Oray\\SunloginClient\\config.ini")
 			bshell($1, "type \"C:\\Program Files\\Oray\\SunLogin\\SunloginClient\\config.ini\"");
 			$currentuser = binfo($1, "user");
@@ -475,6 +476,7 @@ sub SunloginClient{
 				}
 				$currentuser = $tmpname;
 			}
+			bshell($1, "type \"C:\\Users\\$currentuser\\AppData\\Roaming\\Oray\\SunloginClientLite\\sys_lite_config.ini\"");
 			bshell($1, "type \"C:\\ProgramData\\Oray\\SunloginClient\\config.ini\"");
 			btask($1, "向日葵配置注册表信息获取");
 			$arch = binfo($1, "arch");
