@@ -1,3 +1,20 @@
+## 信息收集 ##
+功能:
+* usb历史记录信息收集
+* 判断是否存在域
+* 获取系统盘符
+* 获取已安装的软件
+* 系统基本信息获取
+* 网络信息查询
+* 配置查询
+* 用户查询
+* 用户组查询
+* netsh端口转发设置
+  * netsh端口转发列表查询
+  * netsh端口转发删除
+* 常用软件信息收集
+  * 向日葵信息收集
+
 ## 权限维持 ##
 功能：
 * cs自带的beacon服务马  
@@ -51,3 +68,6 @@
 ![](img/userAccountControl/2.png)
 ![](img/userAccountControl/3.png)
 ![](img/userAccountControl/4.png)
+
+## 向日葵信息收集 ##
+![](img/SunloginClient/SunloginClient.png)
