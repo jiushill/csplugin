@@ -27,6 +27,7 @@
 * java运行class文件
 * dnsadmin账号组进行dns.dll劫持 （适用于域）
 * userAccountControl将ID设置为8192作为域控（适用于域）
+* 以某个进程的Token运行EXE
 
 待开发..............
 
@@ -71,3 +72,5 @@
 
 ## 向日葵信息收集 ##
 ![](img/SunloginClient/SunloginClient.png)
+
+## 以某个进程的Token运行EXE ##
