@@ -1,0 +1,25 @@
+beacon_command_register("pscheck", "" ,"用于查找list.txt里的指定进程tlick:pscheck 1 #会自动寻找指定进程所在的路径(通过调用wmic)");
+alias pscheck {
+	$find = $2;
+	$fhanle = openf(script_resource("list.txt"));
+	$fdata = readAll($fhanle);
+	closef($fhanle);
+	foreach $value ($fdata){
+		($pname, $process) = split("=>", $value);
+		%plist["$pname"] = "$process";
+	}
+	bps($1, lambda({
+      local('$pid $name $entry');
+      foreach $entry (split("\n", $2)) {
+         ($name, $null, $pid) = split("\\s+", $entry);
+         foreach $key => $value (%plist){
+			if($name eq $value){
+				btask($1, "\cB$key $pid");
+				if($find eq "1"){
+					bshell($1, "wmic process where ProcessId=$pid get /value");
+				}
+			}
+		 }
+      }
+    }, $callback => $2));
+}
