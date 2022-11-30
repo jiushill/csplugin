@@ -79,3 +79,7 @@
 ![](img/tokenrun/2.png)
 
 ## C#添加计划任务 ##
+ConsoleApp1.cs是源码，需要依赖Interop.TaskScheduler.dll。这里利用了ILMerge打包成了addtask.exe,.NET 2.0  
+![](img/schtasks/1.png)
+![](img/schtasks/2.png)
+![](img/schtasks/3.png)
