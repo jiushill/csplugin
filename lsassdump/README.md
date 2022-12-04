@@ -6,6 +6,10 @@ lsassdump插件
 * comsvcsdll_minidump
 * vssadmin dump
 
+修改用户密码  
+* setntlm
+* changentlm
+
 至于杀毒🐎,自己check然后改吧  
 
 ![](img/map.png)
@@ -21,3 +25,7 @@ lsassdump插件
 ![](img/vssadmin.png)
 
 支持批量操作
+
+修改用户密码  
+![](img/editpasswd.png)
+![](img/setntlm.png)
