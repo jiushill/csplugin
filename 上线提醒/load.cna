@@ -1,0 +1,13 @@
+on beacon_initial{
+	$host = beacon_info($1, "external");
+	$internal = beacon_info($1, "internal");
+	$listener = beacon_info($1, "listener");
+	$user = beacon_info($1, "user");
+	$computer = beacon_info($1, "computer");
+	$process = beacon_info($1, "process");
+	$pid = beacon_info($1, "pid");
+	$arch = beacon_info($1, "arch");
+	$command = "python " . script_resource("plus.py") . " $host $internal $listener $user $computer $process $pid $arch";
+	exec($command);
+	#println("$content");
+}
